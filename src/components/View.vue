@@ -1,7 +1,8 @@
 <script>
 import Diagram from '@/components/Diagram.vue'
 import Details from '@/components/Details.vue'
-import {Connector, Host, Focus, Evidence, SystemModel} from "@/js/model";
+import {Connector, Host, Focus, Evidence, SystemModel, UNDEFINED, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
+    EXPECTED_PASS, EXPECTED_FAIL, EXPECTED_INCON, UNEXPECTED_FAIL, EXTERNAL} from "@/js/model";
 
 import imageDevice from "@/assets/radio-device-gadget-svgrepo-com.svg";
 import imageRemote from "@/assets/cloud-upload-svgrepo-com.svg";
@@ -85,20 +86,20 @@ export default {
     },
 
     /**
-      * Status overlay
+      * Status or verdict overlay
       */
     statusOverlay(status) {
-      if (status === "Not seen" || status === "External") {
+      if (status === EXPECTED_INCON || status === EXTERNAL) {
         return imageEmpty
       }
-      if (status === "Pass" || status === "Ignore") {
+      if (status === EXPECTED_PASS || status === VERDICT_PASS || status == VERDICT_IGNORE) {
         return imageCheckPass
       }
-      if (status === "Unexpected") {
+      if (status === UNEXPECTED_FAIL) {
         return imageCheckUnexpected
       }
-      if (status === "Missing" || status === "Fail") {
-      return imageCheckFail
+      if (status === EXPECTED_FAIL || status === VERDICT_FAIL) {
+        return imageCheckFail
       }
       return imageQuestionMark
     },
@@ -236,8 +237,8 @@ export default {
         }
         if ("host" in js) {
           let host = Host.parse(this.systemModel, js["host"])
-          self.console.log("Update for host " + host.name)
-          if (host.status === "Undefined") {
+          self.console.log("Update host " + host.id + " " + host.name + " [" + host.status + "]")
+          if (host.status === UNDEFINED) {
             // remove the host
           } else if (!this.focus.isThere() && name1 === host.name && name2 === null) {
             this.focus.setHost(host)  // this host focused by URL
@@ -246,10 +247,9 @@ export default {
         if ("connection" in js) {
           // a connection, but we have all connections between host pair as Connector
           let conn = Connector.parse(this.systemModel, js["connection"])
-          self.console.log("Update for connector " + conn.id)
-          if (conn.status === "Undefined") {
-            // remote the connection
-
+          self.console.log("Update for connector " + conn.id + " [" + conn.status + "]")
+          if (conn.status === UNDEFINED) {
+            // remove the connection
           } else if (!this.focus.isThere() && name1 === conn.source.name && name2 === conn.target.name) {
             this.focus.setConnector(conn)
           }

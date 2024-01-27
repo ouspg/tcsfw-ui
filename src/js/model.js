@@ -1,4 +1,24 @@
-export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence }
+export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence, 
+    VERDICT_FAIL, VERDICT_INCON, VERDICT_PASS, VERDICT_IGNORE, 
+    UNDEFINED, EXPECTED_INCON, EXPECTED_PASS, EXPECTED_FAIL, UNEXPECTED_FAIL, EXTERNAL}
+
+/**
+ * Verdict constants
+ */
+const VERDICT_PASS = "Pass"
+const VERDICT_FAIL = "Fail"
+const VERDICT_INCON = "Incon"
+const VERDICT_IGNORE = "Ignore"
+
+/**
+ * Status/verdict constants
+ */
+const UNDEFINED = "Undefined/Undefined"
+const EXPECTED_INCON = "Expected/Incon"
+const EXPECTED_PASS = "Expected/Pass"
+const EXPECTED_FAIL = "Expected/Fail"
+const UNEXPECTED_FAIL = "Unexpected/Fail"
+const EXTERNAL = "External/Incon"
 
 /**
  * System model
@@ -144,7 +164,7 @@ class Host {
      * Reset
      */
     reset() {
-        this.status = "Undefined"
+        this.status = UNDEFINED
         this.addresses = []
         this.x = -1
         this.y = -1
@@ -156,7 +176,7 @@ class Host {
     list_services(exclude_client_side=true) {
         let r = []
         this.services.forEach(s => {
-            if (s.status === "Undefined") {
+            if (s.status === UNDEFINED) {
                 return
             }
             if (!exclude_client_side || !s.client_side) {
@@ -170,7 +190,7 @@ class Host {
      * Parse from JSON data
      */
     static parse(system, js) {
-        let h = system.getHost(js["id"], js["name"], js["verdict"])
+        let h = system.getHost(js["id"], js["name"], js["status"])
         h.description = js["description"]
         h.kind = js["type"]
         if ("xy" in js) {
@@ -219,7 +239,7 @@ class Service {
      * Reset
      */
     reset() {
-        this.status = "Undefined"
+        this.status = UNDEFINED
         this.addresses = []
         this.properties = new Map()
     }
@@ -228,7 +248,7 @@ class Service {
      * Parse from JSON data
      */
     static parse(system, js) {
-        let s = system.getService(js["id"], js["name"], js["verdict"])
+        let s = system.getService(js["id"], js["name"], js["status"])
         s.description = js["description"]
         s.kind = js["type"]
         if ("client_side" in js) {
@@ -260,7 +280,7 @@ class Connector {
      * Reset
      */
     reset() {
-        this.status = "Undefined"
+        this.status = UNDEFINED
         this.connections = []
         this.lines = []
     }
@@ -272,7 +292,7 @@ class Connector {
         let s_ent = system.entities.get(js["source_id"])
         let t_ent = system.entities.get(js["target_id"])
         // Connection
-        let conn = system.getConnection(js["id"], s_ent, t_ent, js["verdict"])
+        let conn = system.getConnection(js["id"], s_ent, t_ent, js["status"])
         conn.kind = js["type"]
         conn.source_name = js["source"].join(" ")
         conn.target_name = js["target"].join(" ")
@@ -316,9 +336,12 @@ class Connector {
      */
     stack(connection) {
         let c = connection
-        if (this.status === "Pass" || this.status === "Undefined") {
+        if (this.status === EXPECTED_INCON || this.status === UNDEFINED) {
+            this.status = c.status
+        } else if (this.status === EXPECTED_PASS && c.status === EXPECTED_FAIL) {
             this.status = c.status
         }
+
 
         if (this.kind === c.kind) {
             // we are fine
@@ -351,7 +374,7 @@ class Connection {
      */
     reset() {
         this.connector = null
-        this.status = "Undefined"
+        this.status = UNDEFINED
         this.flows = []
     }
 }
@@ -428,13 +451,13 @@ class Focus {
  * Get HTML unicode for status
  */
 function statusChar(status, omit_no_info=false) {
-    if (status === "Not seen" && omit_no_info) {
+    if (status === EXPECTED_INCON && omit_no_info) {
         return ""
     }
-    if (status === "Not seen") {
+    if (status === EXPECTED_INCON) {
         return "&#128310;"
     }
-    if (status === "Pass") {
+    if (status === EXPECTED_PASS) {
         return "&#9989;"
     }
     return "&#128683;"
