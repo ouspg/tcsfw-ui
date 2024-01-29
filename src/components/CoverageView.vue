@@ -52,15 +52,11 @@ export default {
           //return stateName
           switch (stateName) {
               case "Tool Pass": return "&#x25fc;"
-              case "Tool Not seen": return "&square;"
-              // case "Tool Ignore": return "-"
-              case "Tool Ignore": return "&#xff0d;"
               case "Tool Fail": return "X"
+              case "Tool Incon": return "&square;"
+              case "Tool Ignore": return "&#xff0d;"
               case "Manual Pass": return "&#x25cf;"
               case "Manual Ignore": return "-"
-              case "Model Pass": return "&#x25d6;"
-              case "Model Ignore": return "&cir;"
-              case "Model Undefined": return " <b>?</b>"
               default: return stateName
           }
       },
