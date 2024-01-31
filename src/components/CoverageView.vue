@@ -6,6 +6,7 @@ export default {
     data() {
         return {
             sections: [],         // view sections
+            use_targets: false,   // use targets?
             legend: new Map(),    // legend data
             systemInfo: {         // system name
                 systemName: "Coverage view",
@@ -38,6 +39,7 @@ export default {
             r_this.systemInfo.specification = data["specification_name"]
             r_this.sections.length = 0
             r_this.sections.push(...data.sections)
+            r_this.use_targets = data.use_targets
             r_this.legend = new Map(Object.entries(data.legend))
           }
         }
@@ -101,6 +103,7 @@ export default {
       <table class="coverage_table">
         <tr>
           <th class="section_name">{{s.name}}</th>
+          <th v-if="use_targets && s.columns.length > 0" class="section_name"></th> <!-- target -->
           <th v-for="c in s.columns" class="column_name">{{c.name}}</th>
         </tr>
         <!-- Data rows -->
@@ -108,6 +111,9 @@ export default {
           <tr :class="expandRow === r ? 'expanded_row' : ''">
             <th :class="(expandRow === r && expandCell === null ? 'expanded_name': 'row_name') + ' light_' + r.row_light"
                  v-on:click="selectRowCell($event, r)" :title="r.text">{{r.short}}</th>
+            <td v-if="use_targets"
+                :class="(expandRow === r && expandCell === null ? 'expanded_name': 'row_value') + ' light_' + r.row_light + ' target_name'"
+                 v-on:click="selectRowCell($event, r)">{{r.target}}</td>
             <td v-for="c in r.columns"
                 :class="(expandCell === c ? 'expanded_value': 'row_value') + ' light_' + c.light"
                 v-on:click="selectRowCell($event, r, c)" >
@@ -178,6 +184,9 @@ export default {
       background-color: lightgray;
   }
   .expanded_row {
+  }
+  .target_name {
+      width: 1px;
   }
   .info_row {
       padding: 0 10px 0 10px;
