@@ -147,7 +147,7 @@ export default {
     <h2>Legend</h2>
     <table class="legend">
       <tr v-for="n in legend.values()">
-          <template v-if="n.state_name">
+          <template v-if="n.state_name != n.description">
             <td class="legend_marker"><span v-html="cellMarker(n.state_name)"></span></td>
             <td>{{n.description}}</td>
             <td>{{n.count}}</td>
