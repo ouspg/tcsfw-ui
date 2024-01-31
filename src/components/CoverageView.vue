@@ -54,7 +54,7 @@ export default {
               case "Tool Pass": return "&#x25fc;"
               case "Tool Fail": return "X"
               case "Tool Incon": return "&square;"
-              case "Tool Ignore": return "&#xff0d;"
+              case "Tool Ignore": return ""
               case "Manual Pass": return "&#x25cf;"
               case "Manual Ignore": return "-"
               default: return stateName
