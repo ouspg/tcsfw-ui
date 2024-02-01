@@ -126,7 +126,7 @@ export default {
             </td>
           </tr>
           <tr v-if="expandRow === r" class="expanded_row">
-              <td v-if="expandCell" :class="'info_row light_' + expandCell.light" :colspan="1 + r.columns.length">
+              <td v-if="expandCell" :class="'info_row light_' + expandCell.light" :colspan="2 + r.columns.length">
                   <!-- Info for cell -->
                   <text>
                     {{r.id}} <b>at</b> {{expandCell.name}}
@@ -141,7 +141,7 @@ export default {
                     </text>
                   </text>
               </td>
-              <td v-else :class="'info_row light_' + r.row_light" :colspan="1 + r.columns.length">
+              <td v-else :class="'info_row light_' + r.row_light" :colspan="2 + r.columns.length">
                   <!-- Info for row -->
                   <text class="multiline">{{r.text}}</text>
               </td>
