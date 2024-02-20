@@ -2,9 +2,10 @@
 import {inject} from "vue";
 import {Service, statusChar} from "@/js/model";
 import ComponentDetails from "@/components/ComponentDetails.vue";
+import PropertyDetails from "@/components/PropertyDetails.vue";
 
 export default {
-  components: {ComponentDetails},
+  components: {ComponentDetails, PropertyDetails},
   data() {
     return {
       focus: inject('focus'),
@@ -331,7 +332,18 @@ export default {
           </table>
         </div> <!-- showExternal -->
         <div v-else>
-            <!-- Show internals -->
+            <!-- Show properties -->
+            <h4>Annotations
+              <text class="expandable" v-on:click="clickSelectable($event, focus.host)">
+                {{expansionMarker(focus.host, Object.keys(focus.host.properties).length > 0)}}
+              </text>
+            </h4>
+            <table v-if="expandedIds.has(focus.host.id)" class="detail_table">
+              <PropertyDetails :component="focus.host"/>
+            </table>
+
+            <!-- Show components -->
+            <h3 v-if="Object.keys(focus.host.components).length > 0">Components</h3>
             <table class="detail_table">
               <template v-for="com in focus.host.components">
                 <ComponentDetails :component="com" level="0"

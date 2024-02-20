@@ -158,6 +158,7 @@ class Host {
         this.image_scale = 1.0
         this.services = []      // Services
         this.components = []
+        this.properties = new Object()
     }
 
     /**
@@ -214,6 +215,9 @@ class Host {
         }
         if ("components" in js) {
             h.components = js["components"]
+        }
+        if ("properties" in js) {
+            h.properties = js["properties"]
         }
         return h
     }
