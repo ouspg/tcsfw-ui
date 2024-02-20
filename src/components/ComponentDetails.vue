@@ -1,6 +1,7 @@
 <script>
 import {inject, h} from "vue";
-import {Service, statusChar} from "@/js/model";
+
+import imageUnknown from "/src/assets/text-document-svgrepo-com.svg";
 
 export default {
   props: [
@@ -21,6 +22,9 @@ export default {
       levelName() { return "level_" + this.level }
   },
   methods: {
+    propertyMarker() {
+      return imageUnknown
+    }
   },
 }
 </script>
@@ -36,19 +40,16 @@ export default {
             {{component.name}}
             <text class="expandable" v-if="expand">{{expand}}</text>
         </td>
-
-        <td class="right_check"><span v-html="embeddedCheck('', component.verdict)"></span></td>
+        <td class="right_check"><span v-html="embeddedCheck('', component.status)"></span></td>
     </tr>
     <template v-if="expandedIds.has(component.id)">
-      <template v-if="component.release">
-          <tr>
-              <td>Latest release {{component.release.latest_name}} ({{component.release.latest_time}})</td>
-          </tr>
-      </template>
       <tr v-for="(h, k) in component.properties">
           <td :class="entityClass('cell_info', component, k)" v-on:click="clickSelectable($event, component, k)"
                 :title="k">
-            <svg height="25" width="25" class="embedded_check"><image :href="statusOverlay(h.verdict)" width="25"/></svg>
+            <svg height="25" width="25" class="embedded_check">
+              <image v-if="h.verdict && h.verdict !== 'Ignore'" :href="statusOverlay(h.verdict)" width="25"/>
+              <image v-else :href="propertyMarker()" width="25"/>
+            </svg>
             {{h.info}}
           </td>
       </tr>

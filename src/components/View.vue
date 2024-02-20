@@ -89,16 +89,16 @@ export default {
       * Status or verdict overlay
       */
     statusOverlay(status) {
-      if (status === EXPECTED_INCON || status === EXTERNAL) {
+      if (status === "Ignore" || status === "" || status === EXPECTED_INCON || status === EXTERNAL) {
         return imageEmpty
       }
-      if (status === EXPECTED_PASS || status === VERDICT_PASS || status == VERDICT_IGNORE) {
+      if (status === "Pass" || status === EXPECTED_PASS || status === VERDICT_PASS || status == VERDICT_IGNORE) {
         return imageCheckPass
       }
       if (status === UNEXPECTED_FAIL) {
         return imageCheckUnexpected
       }
-      if (status === EXPECTED_FAIL || status === VERDICT_FAIL) {
+      if (status === "Fail" || status === EXPECTED_FAIL || status === VERDICT_FAIL) {
         return imageCheckFail
       }
       return imageQuestionMark
