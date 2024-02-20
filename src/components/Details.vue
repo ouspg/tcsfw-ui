@@ -358,11 +358,19 @@ export default {
                 </template>
               </template>
             </table>
-            <!-- Later: internals per service
+
+            <!-- Internals per service -->
             <template v-for="s in focus.host.list_services()">
-                <h2>{{s.name}}</h2>
+                <h3>
+                  {{s.name}} annotations
+                  <text class="expandable" v-on:click="clickSelectable($event, s)">
+                    {{expansionMarker(s, Object.keys(s.properties).length > 0)}}
+                  </text>
+                </h3>
+                <table v-if="expandedIds.has(s.id)" class="detail_table">
+                  <PropertyDetails :component="s"/>
+                </table>
             </template>
-            -->
         </div>
       </div>
 

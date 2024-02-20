@@ -236,7 +236,7 @@ class Service {
         this.kind = ""
         this.client_side = false
         this.parent_host = null  // Host
-        this.properties = new Map()
+        this.properties = new Object()
     }
 
     /**
@@ -259,7 +259,7 @@ class Service {
             s.client_side = js["client_side"]
         }
         if ("properties" in js) {
-            s.properties = new Map(Object.entries(js["properties"]))
+            s.properties = js["properties"]
         }
         return s
     }
