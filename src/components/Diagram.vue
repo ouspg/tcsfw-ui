@@ -237,7 +237,7 @@ export default {
   mounted() {
     let d_wrapper = document.getElementById("diagram_wrapper")
     let rec = d_wrapper.getBoundingClientRect()
-    console.log("Canvas size: " + rec.width +"x" + rec.height)
+    console.log("Canvas size: " + rec.width +" x " + rec.height)
     this.zoom_size = Math.min(rec.width, rec.height)
 
     // Does not work, canvas inside scrollers not resized?
@@ -261,11 +261,11 @@ export default {
        @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp">
 
     <!-- background -->
-    <pattern id="pattern-checkers" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse">
-      <line x1="0" y1="0" x2="0" y2="25" stroke="lightgrey"></line>
-      <line x1="0" y1="25" x2="25" y2="25" stroke="lightgrey"></line>
-    </pattern>
-    <rect x="0" y="0" :width="1000" :height="1000" fill="url(#pattern-checkers)"></rect>
+    <linearGradient id="pattern-grad" x1="0%" x2="50%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#004080" />
+      <stop offset="100%" stop-color="#001a33" />
+    </linearGradient>
+    <rect x="0" y="0" :width="1000" :height="1000" fill="url(#pattern-grad)"></rect>
 
     <defs>
       <!-- white background for highlighted text - FIXME: how this works and does it work? -->
@@ -287,9 +287,9 @@ export default {
          @click="clickConnector"
          v-on:mouseover="mouseOverEvent($event, c, true)"
          v-on:mouseleave="mouseOverEvent($event, c, false)">
-        <line :x1="xy[0]" :y1="xy[1]" :x2="xy[2]" :y2="xy[3]" stroke="black"
+        <line :x1="xy[0]" :y1="xy[1]" :x2="xy[2]" :y2="xy[3]" stroke="grey"
               :stroke-dasharray="c.kind === `Logical` ? `5,5`: `0`"
-              :stroke-width="highlightIds.has(c.id) ? 7: 1"/>
+              :stroke-width="highlightIds.has(c.id) ? 7: 2"/>
         <svg :x="(xy[0]+xy[2]) / 2 - 25" :y="(xy[1]+xy[3]) / 2 - 25">
           <image width="50" height="50" :href="connectionHandle(c.kind)"/>
           <image :href="statusOverlay(c.status)" width="50" height="50"/>
@@ -308,11 +308,11 @@ export default {
         <image v-bind="hostImageAttributes(h, 0.5)" :href="connectionHandle(h.kind)"/>
       </g>
       <image :href="statusOverlay(h.status)"
-             :x="h.x - entity_width / 2" :y="h.y - entity_width / 2" :width="entity_width" :height="entity_width"/>
+             :x="h.x" :y="h.y - entity_width / 1.5" :width="entity_width / 1.5" :height="entity_width / 1.5"/>
     </g>
     <g v-for="h in listHosts" :class="h.id">
       <text v-if="!highlightIds.has(h.id)" :x="h.x" :y="h.y + entity_width / 2 * 1.2"  :font-size="font_size"
-            stroke="black" text-anchor="middle" dominant-baseline="hanging">{{h.name}}</text>
+            stroke="grey" fill="grey" text-anchor="middle" dominant-baseline="hanging">{{h.name}}</text>
     </g>
 
     <!-- Highlighted text on top -->
