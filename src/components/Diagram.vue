@@ -254,20 +254,11 @@ export default {
 </script>
 
 <template>
-  <!-- <svg viewBox="0 0 1000 1000" id="view_canvas"> -->
-  <!-- <svg :viewBox="`0 0 ${zoom_size} ${zoom_size}`" id="view_canvas"> -->
   <svg viewBox="0 0 1000 1000" :width="zoom_size" :height="zoom_size" id="view_canvas"
        @click="clickBackground"
        @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp">
 
-    <!-- background -->
-    <linearGradient id="pattern-grad" x1="0%" x2="50%" y1="0%" y2="100%">
-      <stop offset="0%" stop-color="#004080" />
-      <stop offset="100%" stop-color="#001a33" />
-    </linearGradient>
-    <rect x="0" y="0" :width="1000" :height="1000" fill="url(#pattern-grad)"></rect>
-
-    <defs>
+   <defs>
       <!-- white background for highlighted text - FIXME: how this works and does it work? -->
       <filter x="0" y="0" width="1" height="1" id="solid">
         <feFlood flood-color="lightgrey" result="bg" />

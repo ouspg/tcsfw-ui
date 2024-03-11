@@ -368,7 +368,7 @@ export default {
   .y_top {
     height: 50px;
     width: 100%;
-    background: lightgray;
+    background: #004080;
     border-bottom-style: solid;
     position: absolute;
     box-sizing: border-box;
@@ -420,6 +420,10 @@ export default {
   .x_right {
     width: 35%;
     float: right;
-    background: lightgray;
+    background: #004080;
+  }
+  #diagram_wrapper {
+    background-color: #001a33;
+    background: linear-gradient(#001a33, #004080);
   }
 </style>
