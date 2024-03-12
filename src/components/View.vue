@@ -359,6 +359,7 @@ export default {
     text-align: left;
     vertical-align: top;
     border-width: 0 0 0 0;
+    scrollbar-color: lightseagreen #001a33;
   }
 
   .y_split {
@@ -377,7 +378,7 @@ export default {
     font-size: 27px;
     margin: 5px 10px;
     float: left;
-    /* border: 1px solid; */
+    color: lightblue;
   }
   .top_menu {
     float: left;

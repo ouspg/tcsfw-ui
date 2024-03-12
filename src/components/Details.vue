@@ -408,6 +408,7 @@ export default {
   #details_top {
     margin: 5px;
     cursor: default;
+    color: lightblue;
   }
   .details_tab {
   }
@@ -423,7 +424,7 @@ export default {
   }
   .expandable {
     font-size: smaller;
-    color: blue;
+    color: rgb(159, 131, 196);
   }
   .arrow {
     font-size: 25px;
@@ -447,16 +448,17 @@ export default {
     border-top: 1px solid black;
   }
   .info_row:hover {
-    border-top: 1px solid black;
-    background-color: silver;
+    background-color: #001a33;
   }
   .info_row_high {
-    background-color: silver;
+    background-color: #001a33;
     border-color: silver;
   }
   .info_row_selected {
-    background-color: silver;
-    border: 1px solid red;
+    background-color: #013464;
+  }
+  .info_row_selected:hover {
+    background-color: #001a33;
   }
   .cell_header {
     padding-top: 20px;
@@ -467,15 +469,14 @@ export default {
   .cell_info {
     padding-left: 10px;
   }
-  .cell_info:hover {
-    background-color: silver;
-  }
   .cell_info_selected {
     padding-left: 10px;
-    background-color: silver;
-    border: 1px solid red;
+    background-color: #001a33;
   }
   .cell_value {
     text-align: right;
+  }
+  .cell_info:hover {
+    background-color: #001a33;
   }
 </style>

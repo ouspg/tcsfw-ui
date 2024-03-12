@@ -258,10 +258,10 @@ export default {
        @click="clickBackground"
        @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp">
 
-   <defs>
-      <!-- white background for highlighted text - FIXME: how this works and does it work? -->
+    <defs>
+      <!-- white background for highlighted text -->
       <filter x="0" y="0" width="1" height="1" id="solid">
-        <feFlood flood-color="lightgrey" result="bg" />
+        <feFlood flood-color="#004080" result="bg" />
         <feMerge>
           <feMergeNode in="bg"/>
           <feMergeNode in="SourceGraphic"/>
@@ -313,7 +313,7 @@ export default {
               v-on:mouseover="mouseOverEvent($event, h, true)"
               v-on:mouseleave="mouseOverEvent($event, h, false)">
         <text :x="h.x" :y="h.y + entity_width / 2 * 1.2"  :font-size="font_size" filter="url(#solid)"
-              stroke="black" text-anchor="middle" dominant-baseline="hanging">{{h.name}}</text>
+              stroke="grey" fill="grey"   text-anchor="middle" dominant-baseline="hanging">{{h.name}}</text>
       </g>
     </g>
 

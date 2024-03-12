@@ -37,21 +37,20 @@ export default {
 </template>
 
 <style>
+  .cell_info:hover {
+    background-color: #013464;
+  }
   .level_0_selected {
-    background-color: silver;
-    border: 1px solid red;
+    background-color: #013464;
   }
   .level_1_selected {
-    background-color: silver;
-    border: 1px solid red;
+    background-color: #013464;
   }
   .level_2_selected {
-    background-color: silver;
-    border: 1px solid red;
+    background-color: #013464;
   }
   .cell_info_selected {
-    background-color: silver;
-    border: 1px solid red;
+    background-color: #013464;
   }
   .info_row {
     cursor: pointer;
