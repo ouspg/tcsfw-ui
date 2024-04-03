@@ -1,4 +1,4 @@
-export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence, 
+export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence, Update,
     VERDICT_FAIL, VERDICT_INCON, VERDICT_PASS, VERDICT_IGNORE, 
     UNDEFINED, EXPECTED_INCON, EXPECTED_PASS, EXPECTED_FAIL, UNEXPECTED_FAIL, EXTERNAL}
 
@@ -456,5 +456,16 @@ class Evidence {
         this.name = name
         this.selected = selected
         this.timestamp = ""
+    }
+}
+
+/**
+ * Status and property update
+ */
+class Update {
+    constructor(js) {
+        this.id = js.id
+        this.status = js.status
+        this.properties = js.properties
     }
 }

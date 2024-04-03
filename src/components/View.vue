@@ -1,7 +1,7 @@
 <script>
 import Diagram from '@/components/Diagram.vue'
 import Details from '@/components/Details.vue'
-import {Connector, Host, Service, Focus, Evidence, SystemModel, UNDEFINED, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
+import {Connector, Host, Service, Focus, Evidence, SystemModel, Update, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
     EXPECTED_PASS, EXPECTED_FAIL, EXPECTED_INCON, UNEXPECTED_FAIL, EXTERNAL} from "@/js/model";
 
 import imageDevice from "@/assets/radio-device-gadget-svgrepo-com.svg";
@@ -238,7 +238,7 @@ export default {
         }
         if (js.host) {
           let host = Host.parse(this.systemModel, js.host)
-          self.console.log("Update host " + host.id + " " + host.name + " [" + host.status + "]")
+          self.console.log("Host " + host.id + " " + host.name + " [" + host.status + "]")
           if (!this.focus.isThere() && name1 === host.name && name2 === null) {
             this.focus.setHost(host)  // this host focused by URL
           }
@@ -246,16 +246,21 @@ export default {
         }
         if (js.service) {
           let service = Service.parse(this.systemModel, js.service)
-          self.console.log("Update service " + service.id + " " + service.name + " [" + service.status + "]")
+          self.console.log("Service " + service.id + " " + service.name + " [" + service.status + "]")
           return
         }
         if (js.connection) {
           // a connection, but we have all connections between host pair as Connector
           let conn = Connector.parse(this.systemModel, js.connection)
-          self.console.log("Update for connector " + conn.id + " [" + conn.status + "]")
+          self.console.log("Connector " + conn.id + " [" + conn.status + "]")
           if (!this.focus.isThere() && name1 === conn.source.name && name2 === conn.target.name) {
             this.focus.setConnector(conn) // this connection focused by URL
           }
+          return
+        }
+        if (js.update) {
+          let up = new Update(js.update)
+          self.console.log("Update for " + up.id)
           return
         }
         if (js.evidence) {
