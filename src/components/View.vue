@@ -239,9 +239,7 @@ export default {
         if (js.host) {
           let host = Host.parse(this.systemModel, js.host)
           self.console.log("Update host " + host.id + " " + host.name + " [" + host.status + "]")
-          if (host.status === UNDEFINED) {
-            // remove the host
-          } else if (!this.focus.isThere() && name1 === host.name && name2 === null) {
+          if (!this.focus.isThere() && name1 === host.name && name2 === null) {
             this.focus.setHost(host)  // this host focused by URL
           }
           return
@@ -250,10 +248,8 @@ export default {
           // a connection, but we have all connections between host pair as Connector
           let conn = Connector.parse(this.systemModel, js.connection)
           self.console.log("Update for connector " + conn.id + " [" + conn.status + "]")
-          if (conn.status === UNDEFINED) {
-            // remove the connection
-          } else if (!this.focus.isThere() && name1 === conn.source.name && name2 === conn.target.name) {
-            this.focus.setConnector(conn)
+          if (!this.focus.isThere() && name1 === conn.source.name && name2 === conn.target.name) {
+            this.focus.setConnector(conn) // this connection focused by URL
           }
           return
         }
