@@ -1,7 +1,7 @@
 <script>
 import Diagram from '@/components/Diagram.vue'
 import Details from '@/components/Details.vue'
-import {Connector, Host, Focus, Evidence, SystemModel, UNDEFINED, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
+import {Connector, Host, Service, Focus, Evidence, SystemModel, UNDEFINED, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
     EXPECTED_PASS, EXPECTED_FAIL, EXPECTED_INCON, UNEXPECTED_FAIL, EXTERNAL} from "@/js/model";
 
 import imageDevice from "@/assets/radio-device-gadget-svgrepo-com.svg";
@@ -242,6 +242,11 @@ export default {
           if (!this.focus.isThere() && name1 === host.name && name2 === null) {
             this.focus.setHost(host)  // this host focused by URL
           }
+          return
+        }
+        if (js.service) {
+          let service = Service.parse(this.systemModel, js.service)
+          self.console.log("Update service " + service.id + " " + service.name + " [" + service.status + "]")
           return
         }
         if (js.connection) {

@@ -100,15 +100,20 @@ class SystemModel {
     /**
      * Get and/or update service.
      */
-    getService(id, name, status) {
-        let e = this.entities.get(id)
-        if (!e) {
-            e = new Service(id)
-            this.entities.set(id, e)
+    getService(host_id, id, name, status) {
+        let host = this.entities.get(host_id)
+        if (!host) {
+            throw new Error("Host not found: " + host_id)
         }
-        e.name = name
-        e.status = status
-        return e
+        let s = this.entities.get(id)
+        if (!s) {
+            s = new Service(id)
+            host.add_service(s)
+            this.entities.set(id, s)
+        }
+        s.name = name
+        s.status = status
+        return s
     }
 
     /**
@@ -188,6 +193,13 @@ class Host {
     }
 
     /**
+     * Add a new service
+     */
+    add_service(service) {
+        this.services.push(service)
+    }
+
+    /**
      * Parse from JSON data
      */
     static parse(system, js) {
@@ -204,14 +216,6 @@ class Host {
         if ("image" in js) {
             h.image = js["image"][0]
             h.image_scale = js["image"][1] / 100.0
-        }
-        if ("services" in js) {
-            h.services = []
-            js["services"].forEach(jss => {
-                let s = Service.parse(system, jss)
-                s.parent_host = h
-                h.services.push(s)
-            })
         }
         if ("components" in js) {
             h.components = js["components"]
@@ -252,7 +256,7 @@ class Service {
      * Parse from JSON data
      */
     static parse(system, js) {
-        let s = system.getService(js["id"], js["name"], js["status"])
+        let s = system.getService(js.host_id, js.id, js.name, js.status)
         s.description = js["description"]
         s.kind = js["type"]
         if ("client_side" in js) {
