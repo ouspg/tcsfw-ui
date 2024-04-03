@@ -228,41 +228,39 @@ export default {
       }
       socket.onmessage = (event) => {
         let js = JSON.parse(event.data)
-        if ("reset" in js) {
+        if (js.reset) {
           this.reset()  // RESET
+          return
         }
-        if ("system" in js) {
-          let rs = js["system"]
-          this.systemModel.parseSystem(rs)
+        if (js.system) {
+          this.systemModel.parseSystem(js.system)
+          return
         }
-        if ("host" in js) {
-          let host = Host.parse(this.systemModel, js["host"])
+        if (js.host) {
+          let host = Host.parse(this.systemModel, js.host)
           self.console.log("Update host " + host.id + " " + host.name + " [" + host.status + "]")
           if (host.status === UNDEFINED) {
             // remove the host
           } else if (!this.focus.isThere() && name1 === host.name && name2 === null) {
             this.focus.setHost(host)  // this host focused by URL
           }
+          return
         }
-        if ("connection" in js) {
+        if (js.connection) {
           // a connection, but we have all connections between host pair as Connector
-          let conn = Connector.parse(this.systemModel, js["connection"])
+          let conn = Connector.parse(this.systemModel, js.connection)
           self.console.log("Update for connector " + conn.id + " [" + conn.status + "]")
           if (conn.status === UNDEFINED) {
             // remove the connection
           } else if (!this.focus.isThere() && name1 === conn.source.name && name2 === conn.target.name) {
             this.focus.setConnector(conn)
           }
+          return
         }
-        if ("flow" in js) {
-          // a flow for a connection
-          let conn = Connector.parseFlow(this.systemModel, js["flow"])
-          self.console.log("Flow for connector " + conn.id)
-        }
-        if ("evidence" in js) {
+        if (js.evidence) {
           let sm = this.systemModel
           sm.evidence.clear()
-          let js_map = new Map(Object.entries(js["evidence"]))
+          let js_map = new Map(Object.entries(js.evidence))
           js_map.forEach(function (ev, key) {
             let e = new Evidence(key, ev.name, ev.selected)
             if ("time_s" in ev) {
@@ -270,6 +268,7 @@ export default {
             }
             sm.evidence.set("evidence-" + key, e)
           })
+          return
         }
       }
       socket.onclose = (event) => {
