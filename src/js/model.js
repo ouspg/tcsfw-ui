@@ -328,18 +328,6 @@ class Connector {
     }
 
     /**
-     * Parse flow from JSON data
-     */
-    static parseFlow(system, js) {
-        // Connection
-        let conn = system.connections.get(js.conn_id)
-        let fl = new Flow(js.dir, js.ends)
-        fl.reference = js.ref
-        conn.flows.push(fl)
-        return conn
-    }
-
-    /**
      * Stack connections
      */
     stack(connection) {
@@ -374,7 +362,6 @@ class Connection {
         this.connector = null // Collector
         this.kind = ""
         this.status = status
-        this.flows = []       // Flows
     }
 
     /**
@@ -383,20 +370,9 @@ class Connection {
     reset() {
         this.connector = null
         this.status = UNDEFINED
-        this.flows = []
     }
 }
 
-/**
- * A flow in a connection
- */
-class Flow {
-    constructor(dir, ends) {
-        this.dir = dir        // "up" or "down"
-        this.ends = ends      // 2 x address strings
-        this.reference = ""
-    }
-}
 
 /**
  * Focus, entity or connection
