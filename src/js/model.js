@@ -1,4 +1,4 @@
-export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence, Update,
+export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence,
     VERDICT_FAIL, VERDICT_INCON, VERDICT_PASS, VERDICT_IGNORE, 
     UNDEFINED, EXPECTED_INCON, EXPECTED_PASS, EXPECTED_FAIL, UNEXPECTED_FAIL, EXTERNAL}
 
@@ -143,6 +143,24 @@ class SystemModel {
         e.target = target
         e.status = status
         return e
+    }
+
+    /**
+     * Perform update for an entity
+     */
+    applyUpdate(id, update) {
+        let e = this.entities.get(id)
+        if (e) {
+            if (update.status) {
+                e.status = update.status
+            }
+            if (update.properties) {
+                // update properties
+                for (const [key, value] of Object.entries(update.properties)) {
+                    e.properties[key] = value
+                }
+            }
+        }
     }
 }
 
@@ -456,16 +474,5 @@ class Evidence {
         this.name = name
         this.selected = selected
         this.timestamp = ""
-    }
-}
-
-/**
- * Status and property update
- */
-class Update {
-    constructor(js) {
-        this.id = js.id
-        this.status = js.status
-        this.properties = js.properties
     }
 }

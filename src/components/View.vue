@@ -1,7 +1,7 @@
 <script>
 import Diagram from '@/components/Diagram.vue'
 import Details from '@/components/Details.vue'
-import {Connector, Host, Service, Focus, Evidence, SystemModel, Update, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
+import {Connector, Host, Service, Focus, Evidence, SystemModel, VERDICT_PASS, VERDICT_FAIL, VERDICT_IGNORE,
     EXPECTED_PASS, EXPECTED_FAIL, EXPECTED_INCON, UNEXPECTED_FAIL, EXTERNAL} from "@/js/model";
 
 import imageDevice from "@/assets/radio-device-gadget-svgrepo-com.svg";
@@ -259,8 +259,9 @@ export default {
           return
         }
         if (js.update) {
-          let up = new Update(js.update)
-          self.console.log("Update for " + up.id)
+          let up_id = js.update.id
+          self.console.log("Update for " + up_id)
+          this.systemModel.applyUpdate(up_id, js.update)
           return
         }
         if (js.evidence) {
