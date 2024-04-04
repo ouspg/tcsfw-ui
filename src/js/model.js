@@ -294,7 +294,7 @@ class Service {
     reset() {
         this.status = UNDEFINED
         this.addresses = []
-        this.properties = new Map()
+        this.properties = new Object()
     }
 
     /**
