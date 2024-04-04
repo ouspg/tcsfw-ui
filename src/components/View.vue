@@ -232,21 +232,11 @@ export default {
           this.reset()  // RESET
           return
         }
-        if (js.system) {
-          this.systemModel.parseSystem(js.system)
-          return
-        }
-        if (js.host) {
-          let host = Host.parse(this.systemModel, js.host)
-          self.console.log("Host " + host.id + " " + host.name + " [" + host.status + "]")
-          if (!this.focus.isThere() && name1 === host.name && name2 === null) {
-            this.focus.setHost(host)  // this host focused by URL
-          }
-          return
-        }
-        if (js.service) {
-          let service = Service.parse(this.systemModel, js.service)
-          self.console.log("Service " + service.id + " " + service.name + " [" + service.status + "]")
+        // Most common events first for performance
+        if (js.update) {
+          let up_id = js.update.id
+          self.console.log("Update for " + up_id)
+          this.systemModel.applyUpdate(up_id, js.update)
           return
         }
         if (js.connection) {
@@ -258,15 +248,26 @@ export default {
           }
           return
         }
+        if (js.service) {
+          let service = Service.parse(this.systemModel, js.service)
+          self.console.log("Service " + service.id + " " + service.name + " [" + service.status + "]")
+          return
+        }
         if (js.component) {
           let com = this.systemModel.parseComponent(js.component, true)
           self.console.log("Component " + com.id + " " + com.name + " [" + com.status + "]")
           return
         }
-        if (js.update) {
-          let up_id = js.update.id
-          self.console.log("Update for " + up_id)
-          this.systemModel.applyUpdate(up_id, js.update)
+        if (js.host) {
+          let host = Host.parse(this.systemModel, js.host)
+          self.console.log("Host " + host.id + " " + host.name + " [" + host.status + "]")
+          if (!this.focus.isThere() && name1 === host.name && name2 === null) {
+            this.focus.setHost(host)  // this host focused by URL
+          }
+          return
+        }
+        if (js.system) {
+          this.systemModel.parseSystem(js.system)
           return
         }
         if (js.evidence) {
