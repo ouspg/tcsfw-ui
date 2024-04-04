@@ -258,6 +258,11 @@ export default {
           }
           return
         }
+        if (js.component) {
+          let com = this.systemModel.parseComponent(js.component, true)
+          self.console.log("Component " + com.id + " " + com.name + " [" + com.status + "]")
+          return
+        }
         if (js.update) {
           let up_id = js.update.id
           self.console.log("Update for " + up_id)

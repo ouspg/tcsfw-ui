@@ -38,6 +38,7 @@ class SystemModel {
      */
     reset() {
         // We want to keep the old instances, but remove some attributes
+        this.components = []
         this.entities.forEach(e => e.reset())
         this.connectors.forEach(c => c.reset())
         this.connections.forEach(c => c.reset())
@@ -146,6 +147,36 @@ class SystemModel {
     }
 
     /**
+     * Get and/or update component
+     */
+    getComponent(id, name, status) {
+        let e = this.entities.get(id)
+        if (!e) {
+            e = new EntityComponent(id, name, status)
+            this.entities.set(id, e)
+        }
+        e.name = name
+        e.status = status
+        return e
+    }
+
+    /**
+     * Parse and place component from JSON
+     */
+    parseComponent(js, root_component=false) {
+        let c = this.getComponent(js.id, js.name, js.status)
+        js.sub_components = EntityComponent.parseList(self, js.sub_components)
+        if (js.properties) {
+            c.properties = js.properties
+        }
+        let host = this.entities.get(js.node_id)
+        if (host && root_component) {
+            host.components.push(c)
+        }
+        return c
+    }
+
+    /**
      * Perform update for an entity
      */
     applyUpdate(id, update) {
@@ -189,9 +220,11 @@ class Host {
      */
     reset() {
         this.status = UNDEFINED
+        this.components = []
         this.addresses = []
         this.x = -1
         this.y = -1
+        this.properties = new Object()
     }
 
     /**
@@ -234,12 +267,6 @@ class Host {
         if (js.image) {
             h.image = js.image[0]
             h.image_scale = js.image[1] / 100.0
-        }
-        if (js.components) {
-            h.components = js.components
-        }
-        if (js.properties) {
-            h.properties = js.properties
         }
         return h
     }
@@ -364,6 +391,44 @@ class Connector {
         } else {
             this.kind = "Admin"
         }
+    }
+}
+
+class EntityComponent {
+    constructor(id, name, status) {
+        this.id = id
+        this.name = name
+        this.status = status
+        this.properties = new Object()
+        this.sub_components = []
+    }
+
+    /**
+     * Reset
+     */
+    reset() {
+        this.status = UNDEFINED
+        this.properties = new Object()
+    }
+
+
+    /**
+     * Parse list of components from JSON, if any
+     */
+    static parseList(system, jsList) {
+        let r = []
+        if (!jsList) {
+            return r
+        }
+        jsList.forEach(js => {
+            c = system.parseComponent(js)
+            c.sub_components = EntityComponent.parseList(system, js.sub_components)
+            if (js.properties) {
+                c.properties = js.properties
+            }
+            r.push(c)
+        })
+        return r
     }
 }
 
