@@ -1,4 +1,4 @@
-export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence, 
+export { SystemModel, Host, Service, Connector, Focus, statusChar, Evidence,
     VERDICT_FAIL, VERDICT_INCON, VERDICT_PASS, VERDICT_IGNORE, 
     UNDEFINED, EXPECTED_INCON, EXPECTED_PASS, EXPECTED_FAIL, UNEXPECTED_FAIL, EXTERNAL}
 
@@ -38,6 +38,7 @@ class SystemModel {
      */
     reset() {
         // We want to keep the old instances, but remove some attributes
+        this.components = []
         this.entities.forEach(e => e.reset())
         this.connectors.forEach(c => c.reset())
         this.connections.forEach(c => c.reset())
@@ -47,9 +48,9 @@ class SystemModel {
      * Parse system from JSON data
      */
     parseSystem(js) {
-        this.name = js["system_name"]
+        this.name = js.system_name
         if ("components" in js) {
-            this.components = js["components"]
+            this.components = js.components
         }
     }
 
@@ -100,15 +101,20 @@ class SystemModel {
     /**
      * Get and/or update service.
      */
-    getService(id, name, status) {
-        let e = this.entities.get(id)
-        if (!e) {
-            e = new Service(id)
-            this.entities.set(id, e)
+    getService(host_id, id, name, status) {
+        let host = this.entities.get(host_id)
+        if (!host) {
+            throw new Error("Host not found: " + host_id)
         }
-        e.name = name
-        e.status = status
-        return e
+        let s = this.entities.get(id)
+        if (!s) {
+            s = new Service(id)
+            host.add_service(s)
+            this.entities.set(id, s)
+        }
+        s.name = name
+        s.status = status
+        return s
     }
 
     /**
@@ -139,6 +145,54 @@ class SystemModel {
         e.status = status
         return e
     }
+
+    /**
+     * Get and/or update component
+     */
+    getComponent(id, name, status) {
+        let e = this.entities.get(id)
+        if (!e) {
+            e = new EntityComponent(id, name, status)
+            this.entities.set(id, e)
+        }
+        e.name = name
+        e.status = status
+        return e
+    }
+
+    /**
+     * Parse and place component from JSON
+     */
+    parseComponent(js, root_component=false) {
+        let c = this.getComponent(js.id, js.name, js.status)
+        js.sub_components = EntityComponent.parseList(self, js.sub_components)
+        if (js.properties) {
+            c.properties = js.properties
+        }
+        let host = this.entities.get(js.node_id)
+        if (host && root_component) {
+            host.components.push(c)
+        }
+        return c
+    }
+
+    /**
+     * Perform update for an entity
+     */
+    applyUpdate(id, update) {
+        let e = this.entities.get(id)
+        if (e) {
+            if (update.status) {
+                e.status = update.status
+            }
+            if (update.properties) {
+                // update properties
+                for (const [key, value] of Object.entries(update.properties)) {
+                    e.properties[key] = value
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -166,9 +220,11 @@ class Host {
      */
     reset() {
         this.status = UNDEFINED
+        this.components = []
         this.addresses = []
         this.x = -1
         this.y = -1
+        this.properties = new Object()
     }
 
     /**
@@ -188,36 +244,29 @@ class Host {
     }
 
     /**
+     * Add a new service
+     */
+    add_service(service) {
+        this.services.push(service)
+    }
+
+    /**
      * Parse from JSON data
      */
     static parse(system, js) {
-        let h = system.getHost(js["id"], js["name"], js["status"])
-        h.description = js["description"]
-        h.kind = js["type"]
-        if ("xy" in js) {
-            h.x = js["xy"][0]  // NOTE: Without this, host is not shown
-            h.y = js["xy"][1]
+        let h = system.getHost(js.id, js.name, js.status)
+        h.description = js.description
+        h.kind = js.type
+        if (js.xy) {
+            h.x = js.xy[0]  // NOTE: Without this, host is not shown
+            h.y = js.xy[1]
         }
-        if ("addresses" in js) {
-            h.addresses = js["addresses"]
+        if (js.addresses) {
+            h.addresses = js.addresses
         }
-        if ("image" in js) {
-            h.image = js["image"][0]
-            h.image_scale = js["image"][1] / 100.0
-        }
-        if ("services" in js) {
-            h.services = []
-            js["services"].forEach(jss => {
-                let s = Service.parse(system, jss)
-                s.parent_host = h
-                h.services.push(s)
-            })
-        }
-        if ("components" in js) {
-            h.components = js["components"]
-        }
-        if ("properties" in js) {
-            h.properties = js["properties"]
+        if (js.image) {
+            h.image = js.image[0]
+            h.image_scale = js.image[1] / 100.0
         }
         return h
     }
@@ -245,21 +294,21 @@ class Service {
     reset() {
         this.status = UNDEFINED
         this.addresses = []
-        this.properties = new Map()
+        this.properties = new Object()
     }
 
     /**
      * Parse from JSON data
      */
     static parse(system, js) {
-        let s = system.getService(js["id"], js["name"], js["status"])
-        s.description = js["description"]
-        s.kind = js["type"]
-        if ("client_side" in js) {
-            s.client_side = js["client_side"]
+        let s = system.getService(js.host_id, js.id, js.name, js.status)
+        s.description = js.description
+        s.kind = js.type
+        if (js.client_side) {
+            s.client_side = js.client_side
         }
-        if ("properties" in js) {
-            s.properties = js["properties"]
+        if (js.properties) {
+            s.properties = js.properties
         }
         return s
     }
@@ -293,16 +342,16 @@ class Connector {
      * Parse from JSON data
      */
     static parse(system, js) {
-        let s_ent = system.entities.get(js["source_id"])
-        let t_ent = system.entities.get(js["target_id"])
+        let s_ent = system.entities.get(js.source_id)
+        let t_ent = system.entities.get(js.target_id)
         // Connection
-        let conn = system.getConnection(js["id"], s_ent, t_ent, js["status"])
-        conn.kind = js["type"]
-        conn.source_name = js["source"].join(" ")
-        conn.target_name = js["target"].join(" ")
+        let conn = system.getConnection(js.id, s_ent, t_ent, js.status)
+        conn.kind = js.type
+        conn.source_name = js.source.join(" ")
+        conn.target_name = js.target.join(" ")
         // Connector, containing 1..n connections
-        let s_host = system.entities.get(js["source_host_id"])
-        let t_host = system.entities.get(js["target_host_id"])
+        let s_host = system.entities.get(js.source_host_id)
+        let t_host = system.entities.get(js.target_host_id)
         let c = system.getConnector(s_host, t_host, conn.status, conn.kind)
         c.stack(conn)
         if (conn.connector === null) {
@@ -313,7 +362,7 @@ class Connector {
         }
         //connector line, at least one connection must have line to show the connector
         //Note: if all connections lose the line, we do not detect and connector remains visible
-        let xy = js["xy_line"]
+        let xy = js.xy_line
         if (xy && xy.length > 0) {
             c.lines = []
             for(let i = 1; i < xy.length; i++) {
@@ -321,18 +370,6 @@ class Connector {
             }
         }
         return c
-    }
-
-    /**
-     * Parse flow from JSON data
-     */
-    static parseFlow(system, js) {
-        // Connection
-        let conn = system.connections.get(js["conn_id"])
-        let fl = new Flow(js["dir"], js["ends"])
-        fl.reference = js["ref"]
-        conn.flows.push(fl)
-        return conn
     }
 
     /**
@@ -357,6 +394,44 @@ class Connector {
     }
 }
 
+class EntityComponent {
+    constructor(id, name, status) {
+        this.id = id
+        this.name = name
+        this.status = status
+        this.properties = new Object()
+        this.sub_components = []
+    }
+
+    /**
+     * Reset
+     */
+    reset() {
+        this.status = UNDEFINED
+        this.properties = new Object()
+    }
+
+
+    /**
+     * Parse list of components from JSON, if any
+     */
+    static parseList(system, jsList) {
+        let r = []
+        if (!jsList) {
+            return r
+        }
+        jsList.forEach(js => {
+            c = system.parseComponent(js)
+            c.sub_components = EntityComponent.parseList(system, js.sub_components)
+            if (js.properties) {
+                c.properties = js.properties
+            }
+            r.push(c)
+        })
+        return r
+    }
+}
+
 /**
  * Connection within connector
  */
@@ -370,7 +445,6 @@ class Connection {
         this.connector = null // Collector
         this.kind = ""
         this.status = status
-        this.flows = []       // Flows
     }
 
     /**
@@ -379,20 +453,9 @@ class Connection {
     reset() {
         this.connector = null
         this.status = UNDEFINED
-        this.flows = []
     }
 }
 
-/**
- * A flow in a connection
- */
-class Flow {
-    constructor(dir, ends) {
-        this.dir = dir        // "up" or "down"
-        this.ends = ends      // 2 x address strings
-        this.reference = ""
-    }
-}
 
 /**
  * Focus, entity or connection
