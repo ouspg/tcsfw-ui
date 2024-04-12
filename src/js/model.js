@@ -180,7 +180,7 @@ class SystemModel {
      * Perform update for an entity
      */
     applyUpdate(id, update) {
-        let e = this.entities.get(id)
+        let e = this.entities.get(id) || this.connectors.get(id)
         if (e) {
             if (update.status) {
                 e.status = update.status
