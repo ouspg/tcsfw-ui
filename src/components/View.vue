@@ -149,6 +149,7 @@ export default {
       let url = window.location.origin + "/api1/reset"
       let req = new XMLHttpRequest()
       req.open("POST", url)
+      req.setRequestHeader("Content-Type", "application/json")
       req.send(post_c)
     },
 
