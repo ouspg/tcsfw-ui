@@ -5,11 +5,15 @@ services:
     environment:
       - TCSFW_SERVER_API_KEY=${TCSFW_SERVER_API_KEY}
     ports:
-      - "8130:8130"
+      - "8180:8180"
+
+  api-proxy:
+    image: raulik/api-proxy
 
   frontend:
     build: .
     ports:
       - "5173:5173"
     depends_on:
+      - api-proxy
       - api-server

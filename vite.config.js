@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/',  // Ensure this is set correctly, especially if you are deploying in a subpath
   plugins: [vue()],
   resolve: {
     alias: {
@@ -21,7 +22,7 @@ export default defineConfig({
     // host: true, // listen in all interfaces
     proxy: {
       "/api1/ws": {
-        target: "ws://localhost:8180",
+        target: "ws://localhost:8181",
         changeOrigin: true,
         secure: false,
       },
@@ -31,4 +32,6 @@ export default defineConfig({
         secure: false,
       },
     },
-  },})
+    // logLevel: 'info', // Options are 'info', 'warn', 'error', or 'silent'
+  },
+})

@@ -3,7 +3,8 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// https://vitejs.dev/config/
+// Used in the dockerized web server
+
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -11,7 +12,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  // Redirect API calls to API
   server: {
     https: {
         key: fileURLToPath(new URL('./ssl/server.key', import.meta.url)),
@@ -19,12 +19,12 @@ export default defineConfig({
     },
     proxy: {
       "/api1/ws": {
-        target: "ws://api-server:8180",
+        target: "ws://api-proxy:8181",
         changeOrigin: true,
         secure: false,
       },
       "/api1": {
-        target: "http://api-server:8180",
+        target: "http://api-proxy:8181",
         changeOrigin: true,
         secure: false,
       },
