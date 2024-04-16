@@ -289,7 +289,7 @@ export default {
                   <span v-html="embeddedCheck(s.kind, s.status)"/>
                 </td>
               </tr>
-              <template v-if="expandedIds.has(s.id)">
+              <template v-if="expandedIds.has(s.id) && s.properties.size > 0">
                 <tr v-for="[k, h] in s.properties">
                     <td :class="entityClass(`cell_info`, s, k)" v-on:click="clickSelectable($event, s, k)"
                         :title="k">
