@@ -327,6 +327,7 @@ class Connector {
         this.status = status
         this.connections = []  // Connections
         this.lines = []        // [x1, y1, x2, y2]
+        this.properties = new Object()
     }
 
     /**
