@@ -83,7 +83,9 @@ export default {
     clickBackground(event) {
       console.log("Background click")
       this.focus.setHost(null)  // clear selection
-      history.replaceState(null, "", window.location.origin + window.location.pathname)
+      let url = new URL(window.location)
+      this.focus.queryParameters(url)
+      history.replaceState(null, "", url.toString())
     },
     clickHost(event) {
       let host = this.focus.setHost(this.findSelectedHost(event.target))
