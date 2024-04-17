@@ -317,9 +317,10 @@ export default {
           return
         }
         if (req.status === 200) {
-          const port = req.response.port
-          this.endpoint_base = window.location.origin + "/proxy/" + port + "/api1"
-          this.endpoint_ws_base = "ws" + window.location.origin.substring(4) + "/proxy/ws/" + port + "/api1/ws"
+          const path = req.response.path || ""
+          const path_ws = req.response.path_ws || ""
+          this.endpoint_base = window.location.origin + path + "/api1"
+          this.endpoint_ws_base = "ws" + window.location.origin.substring(4) + path_ws + "/api1/ws"
           console.log("API base " + this.endpoint_base)
           console.log("API ws base " + this.endpoint_ws_base)
           this.establishWebsocket()
