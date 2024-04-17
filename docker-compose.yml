@@ -15,7 +15,6 @@ services:
     build: .
     environment:
       - VITE_API_PROXY=http://api-proxy:8181
-      - VITE_API_WS_PROXY=ws://api-proxy:8181
     ports:
       - "5173:5173"
     depends_on:
