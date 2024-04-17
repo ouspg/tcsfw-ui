@@ -25,9 +25,22 @@ export default defineConfig({
         target: "ws://localhost:8181",
         changeOrigin: true,
         secure: false,
+        ws: true,
       },
       "/api1": {
-        target: "http://localhost:8180",
+        target: "http://localhost:8181",
+        changeOrigin: true,
+        secure: false,
+      },
+      // Redirects to different API endpoints
+      "/proxy/ws/": {
+        target: "ws://localhost:8181",
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+      "/proxy/": {
+        target: "http://localhost:8181",
         changeOrigin: true,
         secure: false,
       },
