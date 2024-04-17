@@ -13,7 +13,7 @@ COPY src src
 COPY public public
 COPY *.html .
 COPY LICENSE .
-COPY docker.config.js vite.config.js
+COPY vite.config.js vite.config.js
 
 # copy SSL certificates
 COPY ssl/server.key ssl/server.crt ./ssl/

@@ -3,6 +3,9 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+const API_PROXY = process.env.VITE_API_PROXY || 'http://localhost:8181'
+const API_WS_PROXY = process.env.VITE_API_WS_PROXY || 'ws://localhost:8181'
+
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/',  // Ensure this is set correctly, especially if you are deploying in a subpath
@@ -22,25 +25,25 @@ export default defineConfig({
     // host: true, // listen in all interfaces
     proxy: {
       "/api1/ws": {
-        target: "ws://localhost:8181",
+        target: API_WS_PROXY,
         changeOrigin: true,
         secure: false,
         ws: true,
       },
       "/api1": {
-        target: "http://localhost:8181",
+        target: API_PROXY,
         changeOrigin: true,
         secure: false,
       },
       // Redirects to different API endpoints
       "/proxy/ws/": {
-        target: "ws://localhost:8181",
+        target: API_WS_PROXY,
         changeOrigin: true,
         secure: false,
         ws: true,
       },
       "/proxy/": {
-        target: "http://localhost:8181",
+        target: API_PROXY,
         changeOrigin: true,
         secure: false,
       },

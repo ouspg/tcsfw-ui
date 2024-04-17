@@ -1,17 +1,21 @@
 version: '3.8'
 services:
   api-server:
-    image: raulik/ruuvi-test
+    image: raulik/tcsfw-api-server
     environment:
       - TCSFW_SERVER_API_KEY=${TCSFW_SERVER_API_KEY}
-    ports:
-      - "8180:8180"
 
   api-proxy:
-    image: raulik/api-proxy
+    build:
+      context: ./api-proxy
+      args:
+        SERVER: api-server
 
   frontend:
     build: .
+    environment:
+      - VITE_API_PROXY=http://api-proxy:8181
+      - VITE_API_WS_PROXY=ws://api-proxy:8181
     ports:
       - "5173:5173"
     depends_on:
