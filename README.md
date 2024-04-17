@@ -45,3 +45,5 @@ $ npm run dev
 ```
 This should open up HTTPS service to https://localhost:5173/.
 The service is only available from the local machine.
+
+The framework and UI can [deployed](Deployment.md) using Docker compose for development purposes.

@@ -11,7 +11,7 @@ services:
       args:
         SERVER: api-server
 
-  frontend:
+  web-server:
     build: .
     environment:
       - VITE_API_PROXY=http://api-proxy:8181
