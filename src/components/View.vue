@@ -22,6 +22,8 @@ export default {
   components: {Diagram, Details},
   data() {
     return {
+      endpoint_base: window.location.origin,     // overriden once resolved
+      endpoint_ws_base: window.location.origin,
       systemModel: new SystemModel(),
 
       highlightIds: new Map(),     // ids of highlighted entities => 1 primary item and 0 for secondary
@@ -146,7 +148,7 @@ export default {
       let post_c = '{"evidence": {' + cont.join(",") + '}}'
       console.log(post_c)
 
-      let url = window.location.origin + "/api1/reset"
+      let url = this.endpoint_base + "/reset"
       let req = new XMLHttpRequest()
       req.open("POST", url)
       req.setRequestHeader("Content-Type", "application/json")
@@ -161,7 +163,7 @@ export default {
       if (entity_id === null) {
         return
       }
-      let url = window.location.origin + "/api1/log?entity=" + entity_id
+      let url = this.endpoint_base + "/log?entity=" + entity_id
       if (key) {
         url += "&key=" + key
       }
@@ -218,10 +220,7 @@ export default {
       let external = q_params.get("internal") !== "true"
       this.focus.showExternals = external
 
-      let url = window.location.origin + "/api1/ws/model/subscribe?visual=1"
-      if (url.startsWith("http")) {
-        url = "ws" + url.substring(4)
-      }
+      let url = this.endpoint_ws_base + "/model/subscribe?visual=1"
       self.console.log("Open ws-socket: " + url)
       let socket = new WebSocket(url)
       socket.onopen = (event) => {
@@ -302,10 +301,44 @@ export default {
           setTimeout(this.establishWebsocket, 1000)
       }
     },
+
+    /***
+     * Query which endpoint to access and then establish websocket
+     */
+    connectEndpoint() {
+      let req = new XMLHttpRequest()
+      let url = window.location.origin + "/api1/endpoint" + window.location.pathname
+      console.log("Query endpoint " + url)
+      req.open("GET", url)
+      req.withCredentials = true
+      req.responseType = "json"
+      req.onreadystatechange = () => {
+        if (req.readyState !== 4) {
+          return
+        }
+        if (req.status === 200) {
+          const port = req.response.port
+          this.endpoint_base = window.location.origin + "/proxy/" + port + "/api1"
+          this.endpoint_ws_base = "ws" + window.location.origin.substring(4) + "/proxy/ws/" + port + "/api1/ws"
+          console.log("API base " + this.endpoint_base)
+          console.log("API ws base " + this.endpoint_ws_base)
+          this.establishWebsocket()
+        } else if (req.status === 401) {
+          console.log("Endpoint permission check failed")
+          let key = prompt("Please provide the API key to continue")
+          console.log("Setting authentication cookie")
+          document.cookie = "authorization=" + key
+          setTimeout(this.connectEndpoint, 100)
+        } else {
+          console.log("Endpoint unexpected status code " + req.status)
+        }
+      }
+      req.send()
+    }
   },
 
   mounted() {
-    this.establishWebsocket()
+    this.connectEndpoint()
   }
 }
 
