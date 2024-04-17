@@ -307,7 +307,7 @@ export default {
      */
     connectEndpoint() {
       let req = new XMLHttpRequest()
-      let url = window.location.origin + "/api1/endpoint" + window.location.pathname
+      let url = window.location.origin + "/api1/endpoint" + window.location.pathname + window.location.search
       console.log("Query endpoint " + url)
       req.open("GET", url)
       req.withCredentials = true

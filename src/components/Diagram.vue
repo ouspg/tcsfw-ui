@@ -88,8 +88,10 @@ export default {
     clickHost(event) {
       let host = this.focus.setHost(this.findSelectedHost(event.target))
       if (host) {
-        history.replaceState(null, "", window.location.origin + window.location.pathname
-          + this.focus.queryParameters())
+        console.log("Select host: " + host.id)
+        let url = new URL(window.location)
+        this.focus.queryParameters(url)
+        history.replaceState(null, "", url.toString())
       }
       event.stopPropagation()
     },
@@ -100,9 +102,10 @@ export default {
         conn.connections.forEach(c => {
           tail += ", " + c.id
         })
-        console.log("Connector: " + conn.id + tail)
-        history.replaceState(null, "", window.location.origin + window.location.pathname
-          + this.focus.queryParameters())
+        console.log("Select connector: " + conn.id + tail)
+        let url = new URL(window.location)
+        this.focus.queryParameters(url)
+        history.replaceState(null, "", url.toString())
       }
       event.stopPropagation()
     },

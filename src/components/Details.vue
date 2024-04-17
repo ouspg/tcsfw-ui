@@ -225,8 +225,9 @@ export default {
     toggleExternalInternal(value) {
         console.log("External(internal): " + value)
         this.focus.showExternals = value
-        history.replaceState(null, "", window.location.origin + window.location.pathname
-          + this.focus.queryParameters())
+        let url = new URL(window.location)
+        this.focus.queryParameters(url)
+        history.replaceState(null, "", url)
     },
   },
 }
