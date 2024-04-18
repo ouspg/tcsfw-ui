@@ -1,0 +1,21 @@
+services:
+  api-server:
+    image: tcsfw/api-server
+    environment:
+      - TCSFW_SERVER_API_KEY=${TCSFW_SERVER_API_KEY}
+
+  api-proxy:
+    build:
+      context: ./api-proxy
+      args:
+        SERVER: api-server
+
+  web-server:
+    build: .
+    environment:
+      - VITE_API_PROXY=http://api-proxy:8181
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api-proxy
+      - api-server

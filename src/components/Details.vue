@@ -225,8 +225,9 @@ export default {
     toggleExternalInternal(value) {
         console.log("External(internal): " + value)
         this.focus.showExternals = value
-        history.replaceState(null, "", window.location.origin + window.location.pathname
-          + this.focus.queryParameters())
+        let url = new URL(window.location)
+        this.focus.queryParameters(url)
+        history.replaceState(null, "", url)
     },
   },
 }
@@ -289,7 +290,7 @@ export default {
                   <span v-html="embeddedCheck(s.kind, s.status)"/>
                 </td>
               </tr>
-              <template v-if="expandedIds.has(s.id)">
+              <template v-if="expandedIds.has(s.id) && s.properties.size > 0">
                 <tr v-for="[k, h] in s.properties">
                     <td :class="entityClass(`cell_info`, s, k)" v-on:click="clickSelectable($event, s, k)"
                         :title="k">

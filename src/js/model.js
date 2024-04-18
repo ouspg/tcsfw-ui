@@ -327,6 +327,7 @@ class Connector {
         this.status = status
         this.connections = []  // Connections
         this.lines = []        // [x1, y1, x2, y2]
+        this.properties = new Object()
     }
 
     /**
@@ -493,24 +494,24 @@ class Focus {
     }
 
     /**
-     * Get query parameters for this focus
+     * Update query parameters for this focus
      */
-    queryParameters() {
-        let r = ""
+    queryParameters(url) {
+        let parameters = url.searchParams
+        parameters.delete("host")
+        parameters.delete("host2")
+        parameters.delete("internal")
         if (this.host) {
-            r += "&host=" + encodeURIComponent(this.host.name)
+            parameters.set("host", encodeURIComponent(this.host.name))
         }
         if (this.connector) {
-          r += "&host=" + encodeURIComponent(this.connector.source.name) +
-              "&host2=" + encodeURIComponent(this.connector.target.name)
-        }
-        if (r !== "") {
-            r = "?" + r.substring(1)
+            parameters.set("host",  encodeURIComponent(this.connector.source.name))
+            parameters.set("host2", encodeURIComponent(this.connector.target.name))
         }
         if (!this.showExternals) {
-            r += "&internal=" + !this.showExternals
+            parameters.set("internal", !this.showExternals)
         }
-        return r
+        return url
     }
 }
 
