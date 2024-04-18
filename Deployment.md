@@ -6,7 +6,7 @@ The TCSFW can be deployed for development using containers.
 This is done by `docker-compose.yml` located in the project root.
 Deployment uses three containers at the moment:
 
- - `api-server` TCSFW API built elsewhere.
+ - `api-server` Tcsfw API server with the appropriate security statement(s) built-in
  - `api-proxy` Nginx proxy for mediating API calls.
  - `web-server` Entry-point Vite http server in port 5173.
 
@@ -14,12 +14,15 @@ Deployment uses three containers at the moment:
 
 ## API server
 
-API server image can be created by [TCSFW framework](https://github.com/ouspg/tcsfw) Dockerfile.
+API server image is created from the [Tcsfw](https://github.com/ouspg/tcsfw) as instructed in its documentation.
+Adjust the container name to match the name you used.
 
 ## API proxy
 
 API proxy is using [Nginx](https://www.nginx.com/).
 Nginx configuration is in `api-proxy/nginx.conf`. 
+
+The purpose of the API proxy is to redirect API calls into appropriate TCP ports, as each security statement instance is running in separate process with different ports from range 10000-19999.
 
 ## Web server
 
@@ -32,10 +35,4 @@ With properly installed [Docker](https://www.docker.com/) and [Docker compose](h
 
     $ docker compose up --build
 
-
-
-
-
-
-
- 
+The API access token `TCSFW_SERVER_API_KEY` must be set, e.g. in `.env` file.

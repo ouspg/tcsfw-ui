@@ -1,8 +1,11 @@
-# tcsfw-ui
+# Tcsfw-ui
 
 User Interface for [Transparent Cybersecurity Framework](https://github.com/ouspg/tcsfw).
-
 The UI is created with [Vue 3](https://vuejs.org/).
+
+This project also includes instructions for developent [deployment](Deployment.md) of the Tcsfw
+server using Docker.
+Tcsfw server can be ran directly from host machine, check [TCSFW](https://github.com/ouspg/tcsfw) documentation.
 
 ## Installation
 
