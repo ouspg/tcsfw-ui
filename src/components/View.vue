@@ -287,7 +287,7 @@ export default {
       socket.onclose = (event) => {
         if (event.code === 4401) {
           console.log("WS permission check failed")
-          this.connectEndpoint()
+          setTimeout(this.connectEndpoint, 5000)
         } else {
           console.log("WS unexpected close code " + event.code)
         }
@@ -314,7 +314,7 @@ export default {
         }
         if (req.status === 200) {
           console.log("Login success")
-          const api_key = req.response.api_key
+          const api_key = req.response.api_key || ""
           if (api_key) {
             document.cookie = "authorization=" + api_key +";path=/;samesite=strict"
             console.log("New authentication cookie set")
