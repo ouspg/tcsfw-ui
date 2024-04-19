@@ -287,10 +287,7 @@ export default {
       socket.onclose = (event) => {
         if (event.code === 4401) {
           console.log("WS permission check failed")
-          let key = prompt("Please provide the API key to continue")
-          console.log("Setting authentication cookie")
-          document.cookie = "authorization=" + key
-          setTimeout(this.establishWebsocket, 100)
+          this.authenticateUser(this.establishWebsocket)
         } else {
           console.log("WS unexpected close code " + event.code)
         }
@@ -310,7 +307,6 @@ export default {
       let url = window.location.origin + "/api1/endpoint" + window.location.pathname + window.location.search
       console.log("Query endpoint " + url)
       req.open("GET", url)
-      req.withCredentials = true
       req.responseType = "json"
       req.onreadystatechange = () => {
         if (req.readyState !== 4) {
@@ -325,17 +321,43 @@ export default {
           console.log("API ws base " + this.endpoint_ws_base)
           this.establishWebsocket()
         } else if (req.status === 401) {
-          console.log("Endpoint permission check failed")
-          let key = prompt("Please provide the API key to continue")
-          console.log("Setting authentication cookie")
-          document.cookie = "authorization=" + key
-          setTimeout(this.connectEndpoint, 100)
+          this.authenticateUser(this.connectEndpoint)
         } else {
           console.log("Endpoint unexpected status code " + req.status)
         }
       }
       req.send()
-    }
+    },
+
+    /**
+     * (Re-)authenticate by accessing /login and doing basic auth
+     */
+    authenticateUser(successCallback) {
+      console.log("Endpoint permission check failed, authenticating...")
+      let req = new XMLHttpRequest()
+      let url = window.location.origin + "/login/" + window.location.search
+      console.log("Login endpoint " + url)
+      req.open("GET", url)
+      req.responseType = "json"
+      req.onreadystatechange = () => {
+        if (req.readyState !== 4) {
+          return
+        }
+        if (req.status === 200) {
+          let api_key = req.response.api_key
+          document.cookie = "authorization=" + api_key +";path=/;samesite=strict"
+          console.log("Login success, authentication cookie set")
+          setTimeout(successCallback, 500)
+        } else if (req.status === 401) {
+          console.log("Endpoint permission check failed")
+          setTimeout(successCallback, 1000)
+        } else {
+          console.log("Endpoint unexpected status code " + req.status)
+          setTimeout(successCallback, 2000)
+        }
+      }
+      req.send()
+    },
   },
 
   mounted() {
