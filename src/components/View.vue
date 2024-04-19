@@ -22,8 +22,10 @@ export default {
   components: {Diagram, Details},
   data() {
     return {
-      endpoint_base: window.location.origin,     // overriden once resolved
-      endpoint_ws_base: window.location.origin,
+      endpoint_base: window.location.origin + "/api1",   // varies between API instances
+      endpoint_ws_base: window.location.origin.replace(/^http/, "ws") + "/api1",
+      apiProxy: "",
+
       systemModel: new SystemModel(),
 
       highlightIds: new Map(),     // ids of highlighted entities => 1 primary item and 0 for secondary
@@ -152,6 +154,7 @@ export default {
       let req = new XMLHttpRequest()
       req.open("POST", url)
       req.setRequestHeader("Content-Type", "application/json")
+      req.setRequestHeader("X-Api-Proxy", this.apiProxy)
       req.send(post_c)
     },
 
@@ -171,6 +174,7 @@ export default {
 
       let req = new XMLHttpRequest()
       req.open("GET", url)
+      req.setRequestHeader("X-Api-Proxy", this.apiProxy)
       req.responseType = "json"
       req.onreadystatechange = () => {
         if (req.readyState === 4 && req.status === 200) {
@@ -314,16 +318,23 @@ export default {
         }
         if (req.status === 200) {
           console.log("Login success")
-          const api_key = req.response.api_key || ""
-          if (api_key) {
-            document.cookie = "authorization=" + api_key +";path=/;samesite=strict"
+          const apiKey = req.response.api_key || ""
+          if (apiKey) {
+            document.cookie = "authorization=" + apiKey +";path=/;samesite=strict"
             console.log("New authentication cookie set")
           }
-          const path = req.response.path || ""
-          const path_ws = req.response.path_ws || ""
-          this.endpoint_base = window.location.origin + path + "/api1"
-          this.endpoint_ws_base = "ws" + window.location.origin.substring(4) + path_ws + "/api1/ws"
-          console.log("API base " + this.endpoint_base)
+          const proxy = req.response.api_proxy || ""
+          if (proxy) {
+            this.apiProxy = proxy
+            this.endpoint_base = window.location.origin + "/api1"
+            // WS socket does not allow custom headers - using URL hack
+            this.endpoint_ws_base = window.location.origin.replace(/^http/, "ws") + "/proxy/ws/" + proxy + "/api1/ws"
+          } else {
+            this.apiProxy = ""
+            this.endpoint_base = window.location.origin + "/api1"
+            this.endpoint_ws_base = window.location.origin.replace(/^http/, "ws") + "/api1/ws"
+          }
+          console.log("API base " + this.endpoint_base +", X-Api-Proxy: " + this.apiProxy)
           console.log("API ws base " + this.endpoint_ws_base)
           this.establishWebsocket()
         } else if (req.status === 401) {
