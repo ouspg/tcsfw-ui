@@ -1,13 +1,12 @@
 services:
   api-server:
     image: tcsfw/api-server
-    environment:
-      - TCSFW_SERVER_API_KEY=${TCSFW_SERVER_API_KEY}
 
   api-proxy:
     build:
       context: ./api-proxy
       args:
+        USERS: ${USERS}
         SERVER: api-server
 
   web-server:

@@ -22,8 +22,10 @@ export default {
   components: {Diagram, Details},
   data() {
     return {
-      endpoint_base: window.location.origin,     // overriden once resolved
-      endpoint_ws_base: window.location.origin,
+      endpoint_base: window.location.origin + "/api1",   // varies between API instances
+      endpoint_ws_base: window.location.origin.replace(/^http/, "ws") + "/api1",
+      apiProxy: "",
+
       systemModel: new SystemModel(),
 
       highlightIds: new Map(),     // ids of highlighted entities => 1 primary item and 0 for secondary
@@ -152,6 +154,7 @@ export default {
       let req = new XMLHttpRequest()
       req.open("POST", url)
       req.setRequestHeader("Content-Type", "application/json")
+      req.setRequestHeader("X-Api-Proxy", this.apiProxy)
       req.send(post_c)
     },
 
@@ -171,6 +174,7 @@ export default {
 
       let req = new XMLHttpRequest()
       req.open("GET", url)
+      req.setRequestHeader("X-Api-Proxy", this.apiProxy)
       req.responseType = "json"
       req.onreadystatechange = () => {
         if (req.readyState === 4 && req.status === 200) {
@@ -287,10 +291,7 @@ export default {
       socket.onclose = (event) => {
         if (event.code === 4401) {
           console.log("WS permission check failed")
-          let key = prompt("Please provide the API key to continue")
-          console.log("Setting authentication cookie")
-          document.cookie = "authorization=" + key
-          setTimeout(this.establishWebsocket, 100)
+          setTimeout(this.connectEndpoint, 5000)
         } else {
           console.log("WS unexpected close code " + event.code)
         }
@@ -303,39 +304,48 @@ export default {
     },
 
     /***
-     * Query which endpoint to access and then establish websocket
+     * Login to endpoint to access and then establish websocket
      */
     connectEndpoint() {
       let req = new XMLHttpRequest()
-      let url = window.location.origin + "/api1/endpoint" + window.location.pathname + window.location.search
+      let url = window.location.origin + "/login" + window.location.pathname + window.location.search
       console.log("Query endpoint " + url)
       req.open("GET", url)
-      req.withCredentials = true
       req.responseType = "json"
       req.onreadystatechange = () => {
         if (req.readyState !== 4) {
           return
         }
         if (req.status === 200) {
-          const path = req.response.path || ""
-          const path_ws = req.response.path_ws || ""
-          this.endpoint_base = window.location.origin + path + "/api1"
-          this.endpoint_ws_base = "ws" + window.location.origin.substring(4) + path_ws + "/api1/ws"
-          console.log("API base " + this.endpoint_base)
+          console.log("Login success")
+          const apiKey = req.response.api_key || ""
+          if (apiKey) {
+            document.cookie = "authorization=" + apiKey +";path=/;samesite=strict"
+            console.log("New authentication cookie set")
+          }
+          const proxy = req.response.api_proxy || ""
+          if (proxy) {
+            this.apiProxy = proxy
+            this.endpoint_base = window.location.origin + "/api1"
+            // WS socket does not allow custom headers - using URL hack
+            this.endpoint_ws_base = window.location.origin.replace(/^http/, "ws") + "/proxy/ws/" + proxy + "/api1/ws"
+          } else {
+            this.apiProxy = ""
+            this.endpoint_base = window.location.origin + "/api1"
+            this.endpoint_ws_base = window.location.origin.replace(/^http/, "ws") + "/api1/ws"
+          }
+          console.log("API base " + this.endpoint_base +", X-Api-Proxy: " + this.apiProxy)
           console.log("API ws base " + this.endpoint_ws_base)
           this.establishWebsocket()
         } else if (req.status === 401) {
-          console.log("Endpoint permission check failed")
-          let key = prompt("Please provide the API key to continue")
-          console.log("Setting authentication cookie")
-          document.cookie = "authorization=" + key
-          setTimeout(this.connectEndpoint, 100)
+          console.log("Endpoint permission check failed, trying again...")
+          setTimeout(this.connectEndpoint, 1000)
         } else {
           console.log("Endpoint unexpected status code " + req.status)
         }
       }
       req.send()
-    }
+    },
   },
 
   mounted() {

@@ -25,6 +25,11 @@ export default defineConfig({
     // When needed, use: npm run dev -- --host
     // host: true, // listen in all interfaces
     proxy: {
+      "/login": {
+        target: API_PROXY,
+        changeOrigin: true,
+        secure: false,
+      },
       "/api1/ws": {
         target: API_WS_PROXY,
         changeOrigin: true,
