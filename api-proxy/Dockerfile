@@ -9,13 +9,11 @@ RUN touch /etc/nginx/.htpasswd
 RUN echo "$USERS" | tr ',' '\n' | while IFS=':' read un pw; do htpasswd -Bb /etc/nginx/.htpasswd "$un" "$pw"; done;
 RUN cat /etc/nginx/.htpasswd
 
-# nginx configuration template
-ADD nginx.conf /etc/nginx/nginx.conf.template
-
 ARG SERVER
 ENV SERVER=${SERVER}
 
-# substitute environment variables
+# substitute environment variables from nginx template
+ADD nginx.conf /etc/nginx/nginx.conf.template
 RUN envsubst '$SERVER' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
 RUN cat /etc/nginx/nginx.conf
