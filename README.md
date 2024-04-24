@@ -42,11 +42,46 @@ server.crt  server.key
 
 ## Running the server
 
-Now you should be able to start the development web-server in localhost to try you the UI.
-```
-$ npm run dev
-```
-This should open up HTTPS service to https://localhost:5173/.
-The service is only available from the local machine.
-
 The framework and UI can [deployed](Deployment.md) using Docker compose for development purposes.
+At this point, the deployment is not ready for Internet-exposure.
+
+### UI and stand-alone API server
+
+You can run the UI with a stand-alone API server started in following manner (see  [Tcsfw](https://github.com/ouspg/tcsfw) documentation):
+
+    $ TCSFW_SERVER_API_KEY=<key> python <statement.py> --http-server 8180
+
+Now you should be able to start the development web-server in localhost to try you the UI.
+
+    $ npm run dev
+
+This should open up HTTPS service to `https://localhost:5173/login/statement/<statement>?api_key=<key>`.
+You must give the API key in the URL, which is only good for development purposes.
+The server URL can be changed by environment variable `VITA_API_PROXY`.
+
+### UI, proxy, and stand-alone API launcher
+
+In slightly more complex setup, API server runs _launcher_, Nginx proxy is running in container and UI connects into it.
+
+The launcher is part of the Tcsfw and it is run this way:
+
+    $ python tcsfw/launcher.py
+
+As default, it listens in port 8180.
+The proxy is built and started like this:
+
+    $ cd api-proxy/
+    $ docker build -t test/api-proxy --build-arg "SERVER=172.17.0.1" \
+       --build-arg "USERS=user1:pass1"
+
+The `Dockerfile` for the proxy is in `api-proxy/` directory, which contains also other required files.
+The build argument `SERFVER` gives the API server, which should be the address of the host in the docker-space (it may be different than which is used in example).
+The build agument `USERS` list the names and passwords of the test users.
+
+The proxy can now be started like this and it should listen in port 8181:
+
+    $ docker run --rm -p 8181:8181 test/api-proxy
+
+This change in port must be reflected in UI:
+
+    $ VITA_API_PROXY=http://localhost:8181 npm run dev
