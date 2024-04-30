@@ -310,8 +310,12 @@ export default {
      */
     connectEndpoint() {
       let req = new XMLHttpRequest()
-      let url = window.location.origin + "/login" + window.location.pathname + window.location.search
-      console.log("Query endpoint " + url)
+      let location = window.location.pathname
+      if (location.startsWith("/statement")) {
+        location = location.substring(10)
+      }
+      let url = window.location.origin + "/login" + location + window.location.search
+      console.log("Login endpoint " + url +" ...")
       req.open("GET", url)
       req.responseType = "json"
       req.onreadystatechange = () => {
@@ -319,7 +323,7 @@ export default {
           return
         }
         if (req.status === 200) {
-          console.log("Login success")
+          console.log("login success")
           const apiKey = req.response.api_key || ""
           if (apiKey) {
             document.cookie = "authorization=" + apiKey +";path=/;samesite=strict"
