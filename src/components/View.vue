@@ -225,7 +225,7 @@ export default {
       this.focus.showExternals = external
 
       let url = this.endpoint_ws_base + "/model/subscribe?visual=1"
-      self.console.log("Open ws-socket: " + url)
+      self.console.log("Open NEW ws-socket: " + url)
       let socket = new WebSocket(url)
       socket.onopen = (event) => {
         self.console.log("WS socket open")
@@ -291,15 +291,17 @@ export default {
       socket.onclose = (event) => {
         if (event.code === 4401) {
           console.log("WS permission check failed")
-          setTimeout(this.connectEndpoint, 5000)
+          setTimeout(this.connectEndpoint, 1000)
         } else {
+          // Error or reload of the model
           console.log("WS unexpected close code " + event.code)
+          setTimeout(this.connectEndpoint, 1000)
         }
       }
       socket.onerror = (event) => {
         // Error, wait a bit and reconnect
           console.log("WS error")
-          setTimeout(this.establishWebsocket, 1000)
+          // setTimeout(this.connectEndpoint, 1000)
       }
     },
 
