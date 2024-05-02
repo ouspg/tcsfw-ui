@@ -348,6 +348,7 @@ export default {
           setTimeout(this.connectEndpoint, 1000)
         } else {
           console.log("Endpoint unexpected status code " + req.status)
+          setTimeout(this.connectEndpoint, 1000)
         }
       }
       req.send()
