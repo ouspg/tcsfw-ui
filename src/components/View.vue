@@ -225,7 +225,7 @@ export default {
       this.focus.showExternals = external
 
       let url = this.endpoint_ws_base + "/model/subscribe?visual=1"
-      self.console.log("Open ws-socket: " + url)
+      self.console.log("Open NEW ws-socket: " + url)
       let socket = new WebSocket(url)
       socket.onopen = (event) => {
         self.console.log("WS socket open")
@@ -291,15 +291,17 @@ export default {
       socket.onclose = (event) => {
         if (event.code === 4401) {
           console.log("WS permission check failed")
-          setTimeout(this.connectEndpoint, 5000)
+          setTimeout(this.connectEndpoint, 1000)
         } else {
+          // Error or reload of the model
           console.log("WS unexpected close code " + event.code)
+          setTimeout(this.connectEndpoint, 1000)
         }
       }
       socket.onerror = (event) => {
         // Error, wait a bit and reconnect
           console.log("WS error")
-          setTimeout(this.establishWebsocket, 1000)
+          // setTimeout(this.connectEndpoint, 1000)
       }
     },
 
@@ -308,8 +310,12 @@ export default {
      */
     connectEndpoint() {
       let req = new XMLHttpRequest()
-      let url = window.location.origin + "/login" + window.location.pathname + window.location.search
-      console.log("Query endpoint " + url)
+      let location = window.location.pathname
+      if (location.startsWith("/statement")) {
+        location = location.substring(10)
+      }
+      let url = window.location.origin + "/login" + location + window.location.search
+      console.log("Login endpoint " + url +" ...")
       req.open("GET", url)
       req.responseType = "json"
       req.onreadystatechange = () => {
@@ -317,7 +323,7 @@ export default {
           return
         }
         if (req.status === 200) {
-          console.log("Login success")
+          console.log("login success")
           const apiKey = req.response.api_key || ""
           if (apiKey) {
             document.cookie = "authorization=" + apiKey +";path=/;samesite=strict"
@@ -342,6 +348,7 @@ export default {
           setTimeout(this.connectEndpoint, 1000)
         } else {
           console.log("Endpoint unexpected status code " + req.status)
+          setTimeout(this.connectEndpoint, 1000)
         }
       }
       req.send()
