@@ -152,7 +152,7 @@ export default {
         cx: host.x,
         cy: host.y,
         r: this.entity_width / 2 * (is_high ? 1.2 : 1.0),
-        fill: mc ? "#e0e0e0" : "darkkhaki",
+        fill: mc ? "darkgrey" : "darkkhaki",
         stroke: "black",
         'stroke-dasharray': mc ? "10, 10" : "",
       }
@@ -308,7 +308,7 @@ export default {
     </g>
     <g v-for="h in listHosts" :class="h.id">
       <text v-if="!highlightIds.has(h.id)" :x="h.x" :y="h.y + entity_width / 2 * 1.2"  :font-size="font_size"
-            stroke="grey" fill="grey" text-anchor="middle" dominant-baseline="hanging">{{h.name}}</text>
+            stroke="black" fill="black" text-anchor="middle" dominant-baseline="hanging">{{h.name}}</text>
     </g>
 
     <!-- Highlighted text on top -->

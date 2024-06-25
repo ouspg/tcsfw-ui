@@ -478,17 +478,17 @@ export default {
     overflow: auto;
   }
   .x_left {
-    width: 65%;
+    width: 90%;
     float: left;
     /* background: red; */
   }
   .x_right {
-    width: 35%;
+    width: 10%;
     float: right;
     background: #004080;
   }
   #diagram_wrapper {
-    background-color: #001a33;
-    background: linear-gradient(#001a33, #004080);
+    background-color: rgb(226, 224, 224);
+    /* background: linear-gradient(#001a33, #004080);*/ 
   }
 </style>
